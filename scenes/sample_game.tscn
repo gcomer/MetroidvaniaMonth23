@@ -88,8 +88,6 @@ drag_vertical_enabled = true
 drag_top_margin = 0.4
 drag_bottom_margin = 0.1
 
-[node name="RigidBody2D" type="RigidBody2D" parent="Player"]
-
 [node name="TileMap" type="TileMap" parent="."]
 scale = Vector2(0.998182, 1)
 tile_set = ExtResource("6_xvfia")

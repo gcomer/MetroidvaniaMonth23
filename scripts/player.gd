@@ -12,22 +12,24 @@ extends CharacterBody2D
 
 #movement settings
 @export var GRAVITY : float = 2000.0
-@export var WALL_SLIDE_GRAVITY : float = 1500.0
+@export var WALL_SLIDE_GRAVITY : float = 1000.0
 @export var MAX_FALL_SPEED : float = 750.0
-@export var MAX_WALL_SLIDE_SPEED : float = 250.0
+@export var MAX_WALL_SLIDE_SPEED : float = 150.0
 @export var MAX_SPEED : float = 200.0
 @export var MAX_AIR_SPEED : float = 200.0
 @export var WALK_ACCEL : float = 75.0
 @export var AIR_ACCEL : float = 25.0
-@export var DASH : float = 750.0
+@export var DASH_HORIZONTAL : float = 750.0
+@export var DASH_VERTICAL : float = 375.0
 @export var NORMAL_JUMP_HEIGHT : float = -300.0
 @export var WALL_JUMP_HEIGHT : float = -200.0
+@export var WALL_JUMP_PUSH : float = -380.0
 @export var BACKFLIP_JUMP_HEIGHT : float = -1500.0
 @export var COYOTE_TIME : float  = 0.09 #about 5 frames
 @export var JUMP_BUFFER_TIME : float  = 0.09 #about 5 frames
 @export var JUMP_RISE_TIME : float = 0.18
-@export var DASH_COOLDOWN_TIME : float = 1.0
-@export var DASH_DURATION_TIME : float = .1
+@export var DASH_COOLDOWN_TIME : float = 0.25
+@export var DASH_DURATION_TIME : float = .175
 @export var WALL_HANG_TIME : float = .1
 
 #timers
@@ -56,6 +58,7 @@ func _physics_process(_delta):
 	var jump_height = NORMAL_JUMP_HEIGHT
 	var accel = WALK_ACCEL
 	var direction = Input.get_vector("Left", "Right", "Up", "Down")
+	print(get_8way_direction(direction))
 	on_wall_direction = 0;
 	#always: 
 	#	update timers
@@ -105,17 +108,46 @@ func dash(direction):
 		dashing = true
 		dash_available = false
 		if direction:
-			dash_direction = direction
+			dash_direction = get_8way_direction(direction)
 		else:
 			dash_direction = facing_direction
 	#if !dashing:
 	#	dash_duration_timer = DASH_DURATION_TIME
 	if dashing:
-		velocity = dash_direction * DASH
+		velocity.x = dash_direction.x * DASH_HORIZONTAL
+		velocity.y = dash_direction.y * DASH_VERTICAL
 		if dash_duration_timer <= 0.0:
 			dashing = false
 			velocity = Vector2.ZERO
-	
+
+func get_8way_direction(direction):
+	var angle = rad_to_deg(direction.angle())
+	print(angle)
+	#pointed right
+	if angle >= -30 and angle <= 30 :
+		return Vector2(1.0,0.0)
+	#pointed diag. down & right
+	elif angle > 30 and angle < 60 :
+		return Vector2(1.0,1.0).normalized()
+	#pointed down
+	elif angle >= 60 and angle <= 120 :
+		return Vector2(0,1.0)
+	#pointed diag. down & left
+	elif angle > 120 and angle < 150 :
+		return Vector2(-1.0,1.0).normalized()
+	#pointed diag. up & right
+	elif angle < -30 and angle > -60 :
+		return Vector2(1.0,-1.0).normalized()
+	#pointed up
+	elif angle <= -60 and angle >= -120 :
+		return Vector2(0.0,-1.0).normalized()
+	#pointed diag. up & left
+	elif angle < -120 and angle > -150 :
+		return Vector2(-1.0,-1.0).normalized()
+	#pointed left
+	elif angle >= 150 or angle <= -150 :
+		return Vector2(-1.0,0.0).normalized()
+
 func jump():
 	if Input.is_action_just_pressed("Jump") and !jumping:
 		jump_buffer_timer = JUMP_BUFFER_TIME
@@ -130,7 +162,7 @@ func jump():
 			velocity.y = NORMAL_JUMP_HEIGHT
 		else:
 			velocity.y = WALL_JUMP_HEIGHT
-			velocity.x = WALL_JUMP_HEIGHT * on_wall_direction
+			velocity.x = WALL_JUMP_PUSH * on_wall_direction
 	if Input.is_action_just_released("Jump") or jump_rise_timer < 0.0:
 		jump_rise_timer = 0.0
 		jumping = false
