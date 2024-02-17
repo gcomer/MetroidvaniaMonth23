@@ -13,11 +13,10 @@ extends CharacterBody2D
 #movement settings
 @export var GRAVITY : float = 3000.0
 @export var WALL_SLIDE_GRAVITY : float = 1500.0
-@export var MAX_FALL_SPEED : float = 3000.0
+@export var MAX_FALL_SPEED : float = 750.0
 @export var MAX_WALL_SLIDE_SPEED : float = 250.0
 @export var MAX_SPEED : float = 200.0
-@export var MAX_DASH_SPEED : float = 1500.0
-@export var MAX_AIR_SPEED : float = 1500.0
+@export var MAX_AIR_SPEED : float = 200.0
 @export var WALK_ACCEL : float = 75.0
 @export var AIR_ACCEL : float = 25.0
 @export var DASH : float = 750.0
@@ -27,8 +26,8 @@ extends CharacterBody2D
 @export var COYOTE_TIME : float  = 0.09 #about 5 frames
 @export var JUMP_BUFFER_TIME : float  = 0.09 #about 5 frames
 @export var JUMP_RISE_TIME : float = 0.18
-@export var DASH_COOLDOWN_TIME : float = 1.0 
-@export var DASH_DURATION_TIME : float = .10
+@export var DASH_COOLDOWN_TIME : float = 1.0
+@export var DASH_DURATION_TIME : float = .1
 @export var WALL_HANG_TIME : float = .1
 
 #timers
@@ -111,8 +110,9 @@ func dash(direction):
 		dash_available = false
 	#if !dashing:
 	#	dash_duration_timer = DASH_DURATION_TIME
-	if dash_duration_timer <= 0.0:
+	if dash_duration_timer <= 0.0 and dashing:
 		dashing = false
+		velocity = Vector2.ZERO
 	
 func jump():
 	if Input.is_action_just_pressed("Jump") and !jumping:
@@ -137,9 +137,9 @@ func move(direction, grounded):
 	var target_speed = 0.0
 	if direction:
 		#allow player to maintain higher speeds if in air (bunny-hopping)
-		if !grounded:
-			target_speed = MAX_SPEED if abs(velocity.x) < MAX_SPEED else abs(velocity.x)
-		else:
+		#if !grounded:
+		#	target_speed = MAX_SPEED if abs(velocity.x) < MAX_SPEED else abs(velocity.x)
+		#else:
 			target_speed = MAX_SPEED
 	#if player is dashing we want to keep the velocity set in the dash method
 	if !dashing:
