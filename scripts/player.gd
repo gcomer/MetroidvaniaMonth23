@@ -72,7 +72,6 @@ func _physics_process(_delta):
 
 	#grounded
 	if is_on_floor():
-		print("floor")
 		dash_available = true
 		if skidding:
 			print("skrrt")
@@ -102,17 +101,18 @@ func dash(direction):
 	if Input.is_action_just_pressed("Dash") and dash_cooldown_timer <= 0.0 and dash_available:
 		dash_duration_timer = DASH_DURATION_TIME
 		dash_cooldown_timer = DASH_COOLDOWN_TIME
-		if direction:
-			velocity = direction * DASH
-		else:
-			velocity = facing_direction * DASH
 		dashing = true
 		dash_available = false
 	#if !dashing:
 	#	dash_duration_timer = DASH_DURATION_TIME
-	if dash_duration_timer <= 0.0 and dashing:
-		dashing = false
-		velocity = Vector2.ZERO
+	if dashing:
+		if direction:
+			velocity = direction * DASH
+		else:
+			velocity = facing_direction * DASH
+		if dash_duration_timer <= 0.0:
+			dashing = false
+			velocity = Vector2.ZERO
 	
 func jump():
 	if Input.is_action_just_pressed("Jump") and !jumping:
