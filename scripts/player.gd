@@ -20,7 +20,7 @@ extends CharacterBody2D
 @export var MAX_AIR_SPEED : float = 1500.0
 @export var WALK_ACCEL : float = 75.0
 @export var AIR_ACCEL : float = 25.0
-@export var DASH : float = 600.0
+@export var DASH : float = 750.0
 @export var NORMAL_JUMP_HEIGHT : float = -300.0
 @export var WALL_JUMP_HEIGHT : float = -200.0
 @export var BACKFLIP_JUMP_HEIGHT : float = -1500.0
@@ -28,7 +28,8 @@ extends CharacterBody2D
 @export var JUMP_BUFFER_TIME : float  = 0.09 #about 5 frames
 @export var JUMP_RISE_TIME : float = 0.18
 @export var DASH_COOLDOWN_TIME : float = 1.0 
-@export var DASH_DURATION_TIME : float = .25
+@export var DASH_DURATION_TIME : float = .10
+@export var WALL_HANG_TIME : float = .1
 
 #timers
 var coyote_timer : float = COYOTE_TIME
@@ -36,11 +37,13 @@ var jump_buffer_timer : float = 0.0
 var jump_rise_timer : float = 0.0
 var dash_cooldown_timer : float = 0.0
 var dash_duration_timer : float = DASH_DURATION_TIME
+var wall_hang_timer : float = WALL_HANG_TIME
 
 #state flags
 var jumping : bool = false
 var dashing : bool = false
 var skidding : bool = false
+var dash_available : bool = true #dashes are refreshed on ground touch, timer still has to go down
 
 #other
 @onready var last_solid = Vector2.DOWN
@@ -70,11 +73,14 @@ func _physics_process(_delta):
 
 	#grounded
 	if is_on_floor():
+		print("floor")
+		dash_available = true
 		if skidding:
 			print("skrrt")
 		move(direction, true)
 		last_solid = Vector2.DOWN
 		coyote_timer = COYOTE_TIME
+		wall_hang_timer = WALL_HANG_TIME
 	#wall cling
 	elif is_on_wall_only():
 		if !jumping:
@@ -87,13 +93,14 @@ func _physics_process(_delta):
 		if velocity.y > 0.0 : jumping = false
 		process_gravity(_delta, GRAVITY, MAX_FALL_SPEED)
 		move(direction, false)
+		wall_hang_timer = WALL_HANG_TIME
 
 	jump()
 	dash(direction)
 	move_and_slide()
 
 func dash(direction):
-	if Input.is_action_just_pressed("Dash") and dash_cooldown_timer <= 0.0:
+	if Input.is_action_just_pressed("Dash") and dash_cooldown_timer <= 0.0 and dash_available:
 		dash_duration_timer = DASH_DURATION_TIME
 		dash_cooldown_timer = DASH_COOLDOWN_TIME
 		if direction:
@@ -101,6 +108,7 @@ func dash(direction):
 		else:
 			velocity = facing_direction * DASH
 		dashing = true
+		dash_available = false
 	#if !dashing:
 	#	dash_duration_timer = DASH_DURATION_TIME
 	if dash_duration_timer <= 0.0:
@@ -161,10 +169,16 @@ func find_wall_to_latch():
 
 #called every frame we are in air
 func process_gravity(_delta, gravity, max_fall_speed):
-	#if we are sliding up a wall, cut vert speed fast
-	if is_on_wall_only() and velocity.y < 0:
-		velocity.y /= 2
-	velocity.y = move_toward(velocity.y, max_fall_speed, gravity * _delta)
+	var target_velocity = max_fall_speed
+	#if we just hit the wall, cling for a bit:
+	if !dashing:
+		if is_on_wall_only():
+			if wall_hang_timer > 0:
+				target_velocity = 0.0
+			#if we are sliding up a wall, cut vert speed fast
+			if velocity.y <= 0:
+				velocity.y /= 2
+		velocity.y = move_toward(velocity.y, target_velocity, gravity * _delta)
 	#if velocity.y >= MAX_FALL_SPEED: print("zoom")
 
 #only count down the various timers if they are 
@@ -174,3 +188,4 @@ func update_timers(_delta):
 	jump_rise_timer -= _delta
 	dash_cooldown_timer -= _delta
 	dash_duration_timer -= _delta
+	wall_hang_timer -= _delta
