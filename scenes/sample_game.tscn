@@ -1,22 +1,19 @@
-[gd_scene load_steps=7 format=3 uid="uid://cn4sis57vp3si"]
+[gd_scene load_steps=6 format=3 uid="uid://cn4sis57vp3si"]
 
 [ext_resource type="Script" path="res://scripts/sample_game.gd" id="1_omkqs"]
 [ext_resource type="Theme" uid="uid://cb2tqos08yhkd" path="res://assets/MinimalUI/MinimalUI.tres" id="2_nwagm"]
 [ext_resource type="PackedScene" uid="uid://603k3vy4p3f1" path="res://scenes/settings.tscn" id="4_y4cq8"]
-[ext_resource type="Texture2D" uid="uid://bmd56p7rawqp7" path="res://icon.svg" id="5_513x5"]
 [ext_resource type="PackedScene" uid="uid://ep3c2c4xqbx2" path="res://scenes/player.tscn" id="5_vmwyn"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8fvya"]
-size = Vector2(129, 128)
+[ext_resource type="TileSet" uid="uid://ctyjkw5l1buxn" path="res://assets/tilemap/test.tres" id="6_xvfia"]
 
 [node name="SampleGame" type="Node2D"]
 script = ExtResource("1_omkqs")
 
 [node name="ColorRect" type="ColorRect" parent="."]
-offset_left = -2348.0
-offset_top = -1444.0
-offset_right = 4356.0
-offset_bottom = 3009.0
+offset_left = -2364.0
+offset_top = -1435.0
+offset_right = 4340.0
+offset_bottom = 3018.0
 color = Color(0, 0, 0, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -77,23 +74,14 @@ visible = false
 layout_mode = 1
 pre_scene = NodePath("../../..")
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(589, 638)
-scale = Vector2(24.6, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(0.5, 0)
-shape = SubResource("RectangleShape2D_8fvya")
-
-[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D"]
-texture = ExtResource("5_513x5")
-
 [node name="Player" parent="." instance=ExtResource("5_vmwyn")]
 position = Vector2(615, 506)
+scale = Vector2(0.175767, 0.175767)
 floor_snap_length = 50.0
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 offset = Vector2(0, -75)
+zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 position_smoothing_speed = 15.0
 drag_vertical_enabled = true
@@ -102,43 +90,11 @@ drag_bottom_margin = 0.1
 
 [node name="RigidBody2D" type="RigidBody2D" parent="Player"]
 
-[node name="StaticBody2D2" type="StaticBody2D" parent="."]
-position = Vector2(1612, 1319)
-rotation = -0.360153
-scale = Vector2(24.6, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
-position = Vector2(92.6016, -446)
-shape = SubResource("RectangleShape2D_8fvya")
-
-[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D2"]
-position = Vector2(92.3984, -444)
-texture = ExtResource("5_513x5")
-
-[node name="StaticBody2D3" type="StaticBody2D" parent="."]
-position = Vector2(29, 1695)
-scale = Vector2(24.6, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
-position = Vector2(-48.2927, -1329)
-shape = SubResource("RectangleShape2D_8fvya")
-
-[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D3"]
-position = Vector2(-47.4797, -1333)
-texture = ExtResource("5_513x5")
-
-[node name="StaticBody2D4" type="StaticBody2D" parent="."]
-position = Vector2(-467, 1749)
-rotation = -1.57079
-scale = Vector2(24.6, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
-position = Vector2(92.6016, -446)
-shape = SubResource("RectangleShape2D_8fvya")
-
-[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D4"]
-position = Vector2(92.3984, -444)
-texture = ExtResource("5_513x5")
+[node name="TileMap" type="TileMap" parent="."]
+scale = Vector2(0.998182, 1)
+tile_set = ExtResource("6_xvfia")
+format = 2
+layer_0/tile_data = PackedInt32Array(2293795, 393218, 1, 2293796, 458754, 1, 2293797, 524290, 1, 2293798, 589826, 1, 2293799, 655362, 1, 2293800, 720898, 1, 2293801, 786434, 1, 2228260, 458754, 0, 2228261, 524290, 0, 2228262, 589826, 0, 2228263, 655362, 0, 2228264, 720898, 0, 524295, 458754, 0, 524296, 524290, 0, 524297, 589826, 0, 524298, 655362, 0, 524299, 720898, 0, 2359328, 196610, 0, 2359329, 196610, 0, 2359330, 196610, 0, 2359327, 196610, 0, 2359324, 196610, 0, 2359325, 196610, 0, 2359326, 196610, 0, 2359323, 196610, 0, 2359322, 196610, 0, 2359321, 196610, 0, 2359320, 196610, 0, 2359319, 196610, 0, 2359318, 196610, 0, 2359338, 196610, 0, 2359339, 196610, 0, 2359340, 196610, 0, 2359341, 196610, 0, 2359342, 196610, 0, 2359343, 196610, 0, 2359344, 196610, 0, 2424854, 131074, 2, 2490390, 131074, 3, 2424855, 196610, 2, 2490391, 196610, 3, 2424856, 262146, 2, 2490392, 131074, 2, 2424857, 131074, 2, 2490393, 196610, 2, 2424858, 196610, 2, 2490394, 262146, 2, 2424859, 262146, 2, 2490395, 131074, 2, 2555929, 196610, 3, 2555930, 262146, 3, 2555931, 131074, 3, 2490396, 131074, 3, 2555932, 196610, 3, 2490397, 131074, 2, 2555933, 131074, 3, 2555928, 131074, 3, 2424861, 196610, 2, 2424862, 262146, 2, 2490398, 196610, 2, 2424863, 262146, 2, 2490399, 262146, 2, 2424860, 131074, 2, 2555934, 196610, 3, 2555935, 262146, 3, 2490400, 131074, 2, 2555936, 131074, 3, 2490401, 196610, 2, 2555937, 196610, 3, 2490402, 262146, 2, 2555938, 262146, 3, 2490403, 131074, 2, 2555939, 131074, 3, 2490404, 196610, 2, 2555940, 196610, 3, 2490405, 262146, 2, 2555941, 262146, 3, 2490406, 131074, 2, 2555942, 131074, 3, 2490407, 196610, 2, 2555943, 196610, 3, 2490408, 262146, 2, 2555944, 262146, 3, 2490409, 131074, 2, 2555945, 131074, 3, 2490410, 196610, 2, 2555946, 196610, 3, 2490411, 262146, 2, 2555947, 262146, 3, 2490412, 131074, 2, 2555948, 131074, 3, 2490413, 196610, 2, 2555949, 196610, 3, 2490414, 262146, 2, 2555950, 262146, 3, 2424876, 131074, 3, 2424877, 196610, 3, 2424878, 262146, 3, 2424879, 131074, 3, 2424880, 196610, 3, 2359345, 196610, 0, 2424881, 262146, 3, 2490415, 131074, 2, 2555951, 131074, 3, 2490416, 196610, 2, 2555952, 196610, 3, 2490417, 262146, 2, 2555953, 262146, 3, 2359337, 786434, 2, 2424873, 131074, 3, 2424874, 196610, 3, 2424875, 262146, 3, 2359334, 131074, 2, 2424870, 131074, 3, 2359335, 196610, 2, 2424871, 196610, 3, 2359336, 262146, 2, 2424872, 262146, 3, 2359331, 393218, 2, 2424867, 131074, 3, 2359332, 196610, 2, 2424868, 196610, 3, 2359333, 262146, 2, 2424869, 262146, 3, 2424864, 131074, 3, 2424865, 196610, 3, 2424866, 262146, 3, 2097184, 589826, 17, 2162720, 589826, 18, 2097185, 655362, 17, 2162721, 655362, 18, 1966112, 589826, 17, 2031648, 589826, 18, 1966113, 655362, 17, 2031649, 655362, 18, 1835040, 589826, 17, 1900576, 589826, 18, 1835041, 655362, 17, 1900577, 655362, 18, 1703968, 589826, 17, 1769504, 589826, 18, 1703969, 655362, 17, 1769505, 655362, 18, 2097179, 589826, 17, 2162715, 589826, 18, 2097180, 655362, 17, 2162716, 655362, 18, 1966107, 589826, 17, 2031643, 589826, 18, 1966108, 655362, 17, 2031644, 655362, 18, 1835035, 589826, 17, 1900571, 589826, 18, 1835036, 655362, 17, 1900572, 655362, 18, 1703963, 589826, 17, 1769499, 589826, 18, 1703964, 655362, 17, 1769500, 655362, 18, 1572891, 589826, 17, 1638427, 589826, 18, 1572892, 655362, 17, 1638428, 655362, 18, 1441819, 589826, 17, 1507355, 589826, 18, 1441820, 655362, 17, 1507356, 655362, 18, 1310747, 589826, 17, 1376283, 589826, 18, 1310748, 655362, 17, 1376284, 655362, 18, 1572896, 589826, 17, 1638432, 589826, 18, 1572897, 655362, 17, 1638433, 655362, 18, 1441824, 589826, 17, 1507360, 589826, 18, 1441825, 655362, 17, 1507361, 655362, 18, 1310752, 589826, 17, 1376288, 589826, 18, 1310753, 655362, 17, 1376289, 655362, 18, 1310754, 720898, 17, 1310755, 786434, 17, 1310756, 851970, 17, 1310744, 393218, 17, 1310745, 458754, 17, 1310746, 524290, 17, 1835042, 720898, 17, 1835043, 786434, 17, 1835044, 851970, 17)
 
 [connection signal="pressed" from="CanvasLayer/Panel/PauseMenu/Resume" to="." method="_on_resume_pressed"]
 [connection signal="pressed" from="CanvasLayer/Panel/PauseMenu/Option" to="." method="_on_option_pressed"]

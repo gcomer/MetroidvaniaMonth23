@@ -11,22 +11,22 @@ extends CharacterBody2D
 # - push blocks
 
 #movement settings
-@export var GRAVITY : float = 3500.0
-@export var WALL_SLIDE_GRAVITY : float = 1750.0
+@export var GRAVITY : float = 3000.0
+@export var WALL_SLIDE_GRAVITY : float = 1500.0
 @export var MAX_FALL_SPEED : float = 3000.0
 @export var MAX_WALL_SLIDE_SPEED : float = 250.0
-@export var MAX_SPEED : float = 750.0
+@export var MAX_SPEED : float = 200.0
 @export var MAX_DASH_SPEED : float = 1500.0
 @export var MAX_AIR_SPEED : float = 1500.0
 @export var WALK_ACCEL : float = 75.0
-@export var AIR_ACCEL : float = 50.0
-@export var DASH : float = 1500.0
-@export var NORMAL_JUMP_HEIGHT : float = -1000.0
-@export var WALL_JUMP_HEIGHT : float = -750.0
+@export var AIR_ACCEL : float = 25.0
+@export var DASH : float = 600.0
+@export var NORMAL_JUMP_HEIGHT : float = -300.0
+@export var WALL_JUMP_HEIGHT : float = -200.0
 @export var BACKFLIP_JUMP_HEIGHT : float = -1500.0
 @export var COYOTE_TIME : float  = 0.09 #about 5 frames
 @export var JUMP_BUFFER_TIME : float  = 0.09 #about 5 frames
-@export var JUMP_RISE_TIME : float = 0.25
+@export var JUMP_RISE_TIME : float = 0.18
 @export var DASH_COOLDOWN_TIME : float = 1.0 
 @export var DASH_DURATION_TIME : float = .25
 
@@ -75,13 +75,13 @@ func _physics_process(_delta):
 		move(direction, true)
 		last_solid = Vector2.DOWN
 		coyote_timer = COYOTE_TIME
+	#wall cling
 	elif is_on_wall_only():
 		if !jumping:
 			on_wall_direction = find_wall_to_latch()
 		coyote_timer = COYOTE_TIME
 		process_gravity(_delta, WALL_SLIDE_GRAVITY, MAX_WALL_SLIDE_SPEED)
 		move(direction, false)
-		#TODO: make it so jumping on wall pushes you away from wall
 	#in air
 	else:
 		if velocity.y > 0.0 : jumping = false
@@ -161,6 +161,9 @@ func find_wall_to_latch():
 
 #called every frame we are in air
 func process_gravity(_delta, gravity, max_fall_speed):
+	#if we are sliding up a wall, cut vert speed fast
+	if is_on_wall_only() and velocity.y < 0:
+		velocity.y /= 2
 	velocity.y = move_toward(velocity.y, max_fall_speed, gravity * _delta)
 	#if velocity.y >= MAX_FALL_SPEED: print("zoom")
 
