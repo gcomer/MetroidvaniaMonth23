@@ -11,7 +11,7 @@ extends CharacterBody2D
 # - push blocks
 
 #movement settings
-@export var GRAVITY : float = 3000.0
+@export var GRAVITY : float = 2000.0
 @export var WALL_SLIDE_GRAVITY : float = 1500.0
 @export var MAX_FALL_SPEED : float = 750.0
 @export var MAX_WALL_SLIDE_SPEED : float = 250.0
@@ -43,6 +43,7 @@ var jumping : bool = false
 var dashing : bool = false
 var skidding : bool = false
 var dash_available : bool = true #dashes are refreshed on ground touch, timer still has to go down
+var dash_direction : Vector2 = Vector2.ZERO
 
 #other
 @onready var last_solid = Vector2.DOWN
@@ -103,13 +104,14 @@ func dash(direction):
 		dash_cooldown_timer = DASH_COOLDOWN_TIME
 		dashing = true
 		dash_available = false
+		if direction:
+			dash_direction = direction
+		else:
+			dash_direction = facing_direction
 	#if !dashing:
 	#	dash_duration_timer = DASH_DURATION_TIME
 	if dashing:
-		if direction:
-			velocity = direction * DASH
-		else:
-			velocity = facing_direction * DASH
+		velocity = dash_direction * DASH
 		if dash_duration_timer <= 0.0:
 			dashing = false
 			velocity = Vector2.ZERO
