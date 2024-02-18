@@ -39,6 +39,7 @@ var jump_rise_timer : float = 0.0
 var dash_cooldown_timer : float = 0.0
 var dash_duration_timer : float = DASH_DURATION_TIME
 var wall_hang_timer : float = WALL_HANG_TIME
+var attack_cooldown_timer : float = 0.0
 
 #state flags
 var jumping : bool = false
@@ -46,30 +47,26 @@ var dashing : bool = false
 var skidding : bool = false
 var dash_available : bool = true #dashes are refreshed on ground touch, timer still has to go down
 var dash_direction : Vector2 = Vector2.ZERO
+var has_pogoed : bool = false
 
 #other
 @onready var last_solid = Vector2.DOWN
 @onready var facing_direction = Vector2.RIGHT
 @onready var on_wall_direction = 0 #-1: left; 1: right; 0: no wall
+@export var weapon : Weapon 
+var direction = Vector2.ZERO
 
 @onready var screen_size = get_viewport_rect().size
+
+#slow time for testing
+#func _ready():	
+#	Engine.time_scale = .25
 
 func _physics_process(_delta):
 	var jump_height = NORMAL_JUMP_HEIGHT
 	var accel = WALK_ACCEL
-	var direction = Input.get_vector("Left", "Right", "Up", "Down")
-	print(get_8way_direction(direction))
+	direction = Input.get_vector("Left", "Right", "Up", "Down")
 	on_wall_direction = 0;
-	#always: 
-	#	update timers
-	#if grounded:
-	#	move / check for skid
-	#	dash
-	#	jump
-	#if airborn:
-	#	move
-	#	dash
-	#	wall cling
 	
 	#countdown timers for cooldowns/buffers
 	update_timers(_delta)
@@ -97,9 +94,18 @@ func _physics_process(_delta):
 		move(direction, false)
 		wall_hang_timer = WALL_HANG_TIME
 
+	var direction_8way = get_8way_direction(direction)
+	attack(direction_8way)
 	jump()
-	dash(direction)
+	dash(direction_8way)
 	move_and_slide()
+
+func attack(direction):
+	weapon.rotation = rotate_toward(weapon.rotation, direction.angle(), 90)
+	if Input.is_action_just_pressed("Attack") and attack_cooldown_timer <= 0.0:
+		attack_cooldown_timer = weapon.attack_cooldown_time
+		weapon.attack()
+		has_pogoed = false
 
 func dash(direction):
 	if Input.is_action_just_pressed("Dash") and dash_cooldown_timer <= 0.0 and dash_available:
@@ -108,7 +114,7 @@ func dash(direction):
 		dashing = true
 		dash_available = false
 		if direction:
-			dash_direction = get_8way_direction(direction)
+			dash_direction = direction
 		else:
 			dash_direction = facing_direction
 	#if !dashing:
@@ -121,8 +127,9 @@ func dash(direction):
 			velocity = Vector2.ZERO
 
 func get_8way_direction(direction):
+	if !direction: return facing_direction
 	var angle = rad_to_deg(direction.angle())
-	print(angle)
+	#print(angle)
 	#pointed right
 	if angle >= -30 and angle <= 30 :
 		return Vector2(1.0,0.0)
@@ -157,7 +164,7 @@ func jump():
 		coyote_timer = 0.0
 		jumping = true
 	if jumping and jump_rise_timer > 0.0:
-		print(on_wall_direction)
+		#print(on_wall_direction)
 		if on_wall_direction == 0:
 			velocity.y = NORMAL_JUMP_HEIGHT
 		else:
@@ -198,7 +205,7 @@ func find_wall_to_latch():
 		return -1;
 	elif test_move(transform, Vector2.RIGHT):
 		return 1
-	print("We probably shouldn't reach this code...")
+	#print("We probably shouldn't reach this code...")
 	return 0
 
 #called every frame we are in air
@@ -223,3 +230,15 @@ func update_timers(_delta):
 	dash_cooldown_timer -= _delta
 	dash_duration_timer -= _delta
 	wall_hang_timer -= _delta
+	attack_cooldown_timer -= _delta
+
+func take_damage(damage: int):
+	print("damaged:" + str(damage))
+	
+func pogo(pogo_height):
+	print("player pogo called")
+	if !has_pogoed:
+		velocity.y = pogo_height
+		dash_available = true
+		dash_cooldown_timer = 0.0
+	has_pogoed = true
